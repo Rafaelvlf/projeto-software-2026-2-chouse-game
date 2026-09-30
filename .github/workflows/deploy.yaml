@@ -48,6 +48,17 @@ jobs:
         key: ${{ secrets.KEY_TEST }}
         port: 22
         script: |
-          docker stop chouse-game
-          docker rm --force chouse-game
-          docker run  -d -p 8080:8080 --name chouse-game rafaelvlf/chouse-game:${{ github.sha }}
+          docker network create chouse-net 2>/dev/null || true
+          docker stop chouse-game 2>/dev/null || true
+          docker rm --force chouse-game 2>/dev/null || true
+          docker run -d \
+            --name chouse-game \
+            --network chouse-net \
+            --restart unless-stopped \
+            -p 8080:8080 \
+            -e DATABASE_URL=jdbc:postgresql://chouse-game-db:5432/chouse_game \
+            -e DATABASE_USERNAME=postgres \
+            -e DATABASE_PASSWORD=postgres \
+            -e POLL_SERVICE_URL=http://chouse-pool:8080 \
+            -e USER_SERVICE_URL=http://chouse-user:8080 \
+            rafaelvlf/chouse-game:${{ github.sha }}
