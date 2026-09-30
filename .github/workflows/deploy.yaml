@@ -62,3 +62,4 @@ jobs:
             -e POLL_SERVICE_URL=http://chouse-pool:8080 \
             -e USER_SERVICE_URL=http://chouse-user:8080 \
             rafaelvlf/chouse-game:${{ github.sha }}
+          docker image prune -a -f
